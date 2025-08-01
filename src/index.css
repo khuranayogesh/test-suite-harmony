@@ -2,41 +2,54 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
-
+/* Regression Assistant Design System */
 @layer base {
   :root {
+    /* Main brand colors */
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
-
+    
+    /* Deep purple primary color #582C8E */
+    --primary: 271 51% 36%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 271 51% 46%;
+    --primary-dark: 271 51% 26%;
+    
+    /* Gradient colors */
+    --gradient-start: 271 51% 36%;
+    --gradient-end: 271 51% 56%;
+    --gradient-light: 271 30% 95%;
+    
+    /* Component colors */
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
-
+    
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
+    
+    --secondary: 271 30% 95%;
+    --secondary-foreground: 271 51% 36%;
+    
+    --muted: 220 14.3% 95.9%;
+    --muted-foreground: 220 8.9% 46.1%;
+    
+    --accent: 271 30% 95%;
+    --accent-foreground: 271 51% 36%;
+    
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
+    --destructive-foreground: 0 0% 98%;
+    
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 98%;
+    
+    --warning: 45 93% 47%;
+    --warning-foreground: 0 0% 98%;
+    
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 271 51% 36%;
+    
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
 
@@ -101,5 +114,82 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  }
+}
+
+@layer components {
+  /* Custom gradients */
+  .gradient-primary {
+    background: linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-end)));
+  }
+  
+  .gradient-light {
+    background: linear-gradient(135deg, hsl(var(--gradient-light)), hsl(var(--background)));
+  }
+  
+  /* Button variants */
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-all duration-200;
+  }
+  
+  /* Status colors */
+  .status-completed {
+    @apply bg-success/10 text-success border-success/20;
+  }
+  
+  .status-pending {
+    @apply bg-warning/10 text-warning border-warning/20;
+  }
+  
+  .status-issue {
+    @apply bg-destructive/10 text-destructive border-destructive/20;
+  }
+  
+  /* Sidebar styles */
+  .sidebar-item {
+    @apply flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200;
+  }
+  
+  .sidebar-item:hover {
+    @apply bg-primary/10 text-primary;
+  }
+  
+  .sidebar-item.active {
+    @apply bg-primary text-primary-foreground;
+  }
+  
+  /* Form styles */
+  .form-input {
+    @apply w-full px-3 py-2 border border-input rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent;
+  }
+  
+  .form-select {
+    @apply w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent;
+  }
+  
+  /* Card styles */
+  .card-elevated {
+    @apply bg-card border border-border rounded-lg shadow-lg;
+  }
+  
+  /* Animation utilities */
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }
