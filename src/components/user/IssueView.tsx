@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { DataManager } from '@/utils/dataManager';
-import { Issue } from '@/types';
-import { CheckCircle, RotateCcw, Save } from 'lucide-react';
+import { Issue, Screenshot } from '@/types';
+import { CheckCircle, RotateCcw, Save, Eye, ZoomIn } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface IssueViewProps {
@@ -80,9 +81,40 @@ export function IssueView({ issue, onUpdate }: IssueViewProps) {
           <label className="block text-sm font-medium text-muted-foreground mb-2">Screenshots</label>
           <div className="grid grid-cols-2 gap-4">
             {issue.screenshots.map(screenshot => (
-              <div key={screenshot.id} className="bg-secondary rounded-lg p-3">
+              <div key={screenshot.id} className="bg-secondary rounded-lg p-3 relative group">
                 <img src={screenshot.path} alt={screenshot.fileName} className="w-full h-32 object-cover rounded" />
                 <p className="text-xs mt-2">{screenshot.description || screenshot.fileName}</p>
+                
+                {/* View Screenshot Button */}
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <ZoomIn className="h-4 w-4" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-4xl">
+                    <DialogHeader>
+                      <DialogTitle>{screenshot.fileName}</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <img 
+                        src={screenshot.path} 
+                        alt={screenshot.fileName} 
+                        className="w-full max-h-[70vh] object-contain rounded"
+                      />
+                      {screenshot.description && (
+                        <div>
+                          <label className="block text-sm font-medium text-muted-foreground mb-1">Description</label>
+                          <p className="text-sm">{screenshot.description}</p>
+                        </div>
+                      )}
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
             ))}
           </div>
