@@ -51,6 +51,7 @@ export interface Issue {
   issueNumber: number;
   scriptId?: string;
   description: string;
+  resolution?: string;
   screenshots: Screenshot[];
   status: 'Open' | 'Fixed' | 'Reopen';
   createdAt: string;

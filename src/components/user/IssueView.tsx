@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { DataManager } from '@/utils/dataManager';
 import { Issue } from '@/types';
-import { CheckCircle, RotateCcw } from 'lucide-react';
+import { CheckCircle, RotateCcw, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface IssueViewProps {
@@ -12,6 +13,7 @@ interface IssueViewProps {
 
 export function IssueView({ issue, onUpdate }: IssueViewProps) {
   const { toast } = useToast();
+  const [resolution, setResolution] = useState(issue.resolution || '');
 
   const handleStatusChange = (newStatus: 'Fixed' | 'Reopen') => {
     try {
@@ -25,6 +27,23 @@ export function IssueView({ issue, onUpdate }: IssueViewProps) {
       toast({
         title: "Error",
         description: "Failed to update issue status",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleResolutionSave = () => {
+    try {
+      DataManager.updateIssue(issue.id, { resolution });
+      onUpdate();
+      toast({
+        title: "Success",
+        description: "Resolution saved successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save resolution",
         variant: "destructive",
       });
     }
@@ -69,6 +88,25 @@ export function IssueView({ issue, onUpdate }: IssueViewProps) {
           </div>
         </div>
       )}
+
+      <div>
+        <label className="block text-sm font-medium text-muted-foreground mb-2">Resolution</label>
+        <Textarea
+          value={resolution}
+          onChange={(e) => setResolution(e.target.value)}
+          placeholder="Enter resolution details..."
+          className="min-h-20"
+        />
+        <Button
+          onClick={handleResolutionSave}
+          size="sm"
+          className="mt-2"
+          disabled={resolution === (issue.resolution || '')}
+        >
+          <Save className="h-4 w-4 mr-2" />
+          Save Resolution
+        </Button>
+      </div>
 
       <div className="flex gap-2 pt-4 border-t">
         {(issue.status === 'Open' || issue.status === 'Reopen') && (
