@@ -12,9 +12,10 @@ import { useToast } from '@/hooks/use-toast';
 interface ScriptExecutionProps {
   script: ImportedScript;
   onClose: () => void;
+  isViewMode?: boolean;
 }
 
-export function ScriptExecution({ script, onClose }: ScriptExecutionProps) {
+export function ScriptExecution({ script, onClose, isViewMode = false }: ScriptExecutionProps) {
   const [remarks, setRemarks] = useState(script.remarks || '');
   const [userScreenshots, setUserScreenshots] = useState<Screenshot[]>(script.userScreenshots || []);
   const [issues, setIssues] = useState<Issue[]>([]);
@@ -332,102 +333,177 @@ export function ScriptExecution({ script, onClose }: ScriptExecutionProps) {
         )}
       </div>
 
-      {/* User Input Section */}
-      <div className="border-t border-border pt-6 space-y-4">
-        <div>
-          <Label htmlFor="remarks">Remarks (if any)</Label>
-          <Textarea
-            id="remarks"
-            value={remarks}
-            onChange={(e) => setRemarks(e.target.value)}
-            placeholder="Add any remarks about the test execution"
-            className="form-input mt-1"
-            rows={4}
-          />
-        </div>
-
-        {/* User Screenshots */}
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <Label>Add Screenshots (if any)</Label>
-            <div>
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={(e) => handleScreenshotUpload(e, false)}
-                className="hidden"
-                id="user-screenshot-upload"
-              />
-              <Button
-                type="button"
-                onClick={() => document.getElementById('user-screenshot-upload')?.click()}
-                size="sm"
-                variant="outline"
-              >
-                <Upload className="h-4 w-4 mr-2" />
-                Add Screenshots
-              </Button>
-            </div>
+      {/* User Input Section - hide in view mode */}
+      {!isViewMode && (
+        <div className="border-t border-border pt-6 space-y-4">
+          <div>
+            <Label htmlFor="remarks">Remarks (if any)</Label>
+            <Textarea
+              id="remarks"
+              value={remarks}
+              onChange={(e) => setRemarks(e.target.value)}
+              placeholder="Add any remarks about the test execution"
+              className="form-input mt-1"
+              rows={4}
+            />
           </div>
-          
-          {userScreenshots.length > 0 && (
-            <div className="space-y-3">
-              {userScreenshots.map(screenshot => (
-                <div key={screenshot.id} className="p-3 bg-secondary rounded-lg">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium text-sm">{screenshot.fileName}</span>
-                    <Button
-                      type="button"
-                      onClick={() => removeScreenshot(screenshot.id, false)}
-                      size="sm"
-                      variant="outline"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
+
+          {/* User Screenshots */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <Label>Add Screenshots (if any)</Label>
+              <div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={(e) => handleScreenshotUpload(e, false)}
+                  className="hidden"
+                  id="user-screenshot-upload"
+                />
+                <Button
+                  type="button"
+                  onClick={() => document.getElementById('user-screenshot-upload')?.click()}
+                  size="sm"
+                  variant="outline"
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Add Screenshots
+                </Button>
+              </div>
+            </div>
+            
+            {userScreenshots.length > 0 && (
+              <div className="space-y-3">
+                {userScreenshots.map(screenshot => (
+                  <div key={screenshot.id} className="p-3 bg-secondary rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-medium text-sm">{screenshot.fileName}</span>
+                      <Button
+                        type="button"
+                        onClick={() => removeScreenshot(screenshot.id, false)}
+                        size="sm"
+                        variant="outline"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <Input
+                      value={screenshot.description}
+                      onChange={(e) => updateScreenshotDescription(screenshot.id, e.target.value, false)}
+                      placeholder="Enter screenshot description"
+                      className="form-input"
+                    />
                   </div>
-                  <Input
-                    value={screenshot.description}
-                    onChange={(e) => updateScreenshotDescription(screenshot.id, e.target.value, false)}
-                    placeholder="Enter screenshot description"
-                    className="form-input"
-                  />
-                </div>
-              ))}
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* View-only user screenshots and remarks */}
+      {isViewMode && (
+        <div className="border-t border-border pt-6 space-y-4">
+          {script.remarks && (
+            <div>
+              <Label>Remarks</Label>
+              <div className="p-3 bg-secondary rounded-lg mt-1">
+                <p className="whitespace-pre-wrap">{script.remarks}</p>
+              </div>
+            </div>
+          )}
+
+          {script.userScreenshots.length > 0 && (
+            <div>
+              <Label>User Screenshots</Label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
+                {script.userScreenshots.map((screenshot) => (
+                  <div key={screenshot.id} className="bg-secondary rounded-lg p-3 relative group">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium">{screenshot.fileName}</span>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-4xl">
+                          <DialogHeader>
+                            <DialogTitle>{screenshot.fileName}</DialogTitle>
+                          </DialogHeader>
+                          <img 
+                            src={screenshot.path} 
+                            alt={screenshot.description || screenshot.fileName}
+                            className="w-full h-auto rounded-lg"
+                          />
+                          {screenshot.description && (
+                            <p className="mt-2 text-sm text-muted-foreground">{screenshot.description}</p>
+                          )}
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                    <img 
+                      src={screenshot.path} 
+                      alt={screenshot.description || screenshot.fileName}
+                      className="w-full h-32 object-cover rounded-md"
+                    />
+                    {screenshot.description && (
+                      <p className="text-xs text-muted-foreground mt-2">{screenshot.description}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
-      </div>
+      )}
 
-      {/* Action Buttons */}
-      <div className="flex flex-wrap gap-3 pt-4 border-t border-border">
-        <Button onClick={handleMarkComplete} className="btn-primary">
-          <CheckCircle className="h-4 w-4 mr-2" />
-          Mark as Complete
-        </Button>
-        
-        <Button onClick={() => setShowRaiseIssue(true)} variant="outline">
-          <AlertTriangle className="h-4 w-4 mr-2" />
-          Raise Issue
-        </Button>
-
-        {issues.length > 0 && (
-          <Button onClick={() => setShowLinkIssue(true)} variant="outline">
-            <Link className="h-4 w-4 mr-2" />
-            Link Existing Issue
+      {/* Action Buttons - hide in view mode */}
+      {!isViewMode && (
+        <div className="flex flex-wrap gap-3 pt-4 border-t border-border">
+          <Button onClick={handleMarkComplete} className="btn-primary">
+            <CheckCircle className="h-4 w-4 mr-2" />
+            Mark as Complete
           </Button>
-        )}
-        
-        <Button onClick={handleSave} variant="outline">
-          <Save className="h-4 w-4 mr-2" />
-          Save
-        </Button>
-        
-        <Button onClick={onClose} variant="outline">
-          <X className="h-4 w-4 mr-2" />
-          Cancel
-        </Button>
-      </div>
+          
+          <Button onClick={() => setShowRaiseIssue(true)} variant="outline">
+            <AlertTriangle className="h-4 w-4 mr-2" />
+            Raise Issue
+          </Button>
+
+          {issues.length > 0 && (
+            <Button onClick={() => setShowLinkIssue(true)} variant="outline">
+              <Link className="h-4 w-4 mr-2" />
+              Link Existing Issue
+            </Button>
+          )}
+          
+          <Button onClick={handleSave} variant="outline">
+            <Save className="h-4 w-4 mr-2" />
+            Save
+          </Button>
+          
+          <Button onClick={onClose} variant="outline">
+            <X className="h-4 w-4 mr-2" />
+            Cancel
+          </Button>
+        </div>
+      )}
+
+      {/* Close button for view mode */}
+      {isViewMode && (
+        <div className="flex justify-end pt-4 border-t border-border">
+          <Button onClick={onClose} variant="outline">
+            <X className="h-4 w-4 mr-2" />
+            Close
+          </Button>
+        </div>
+      )}
 
       {/* Raise Issue Dialog */}
       {showRaiseIssue && (

@@ -16,6 +16,7 @@ export function TestLab({ view }: TestLabProps) {
   const [scripts, setScripts] = useState<ImportedScript[]>([]);
   const [issues, setIssues] = useState<Issue[]>([]);
   const [executingScript, setExecutingScript] = useState<ImportedScript | null>(null);
+  const [viewingScript, setViewingScript] = useState<ImportedScript | null>(null);
   const [viewingIssue, setViewingIssue] = useState<Issue | null>(null);
 
   useEffect(() => {
@@ -191,10 +192,18 @@ export function TestLab({ view }: TestLabProps) {
                           </div>
                         )}
                       </div>
-                      
-                      <div className="flex gap-2">
-                        {getButtonForScript(script)}
-                      </div>
+                       
+                       <div className="flex gap-2">
+                         <Button
+                           onClick={() => setViewingScript(script)}
+                           variant="outline"
+                           size="sm"
+                         >
+                           <Eye className="h-4 w-4 mr-2" />
+                           View
+                         </Button>
+                         {getButtonForScript(script)}
+                       </div>
                     </div>
                   </div>
                 );
@@ -220,6 +229,22 @@ export function TestLab({ view }: TestLabProps) {
                 setExecutingScript(null);
                 loadData();
               }}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Script View Dialog */}
+      {viewingScript && (
+        <Dialog open={!!viewingScript} onOpenChange={() => setViewingScript(null)}>
+          <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>View Script: {viewingScript.scriptId}</DialogTitle>
+            </DialogHeader>
+            <ScriptExecution
+              script={viewingScript}
+              isViewMode={true}
+              onClose={() => setViewingScript(null)}
             />
           </DialogContent>
         </Dialog>
