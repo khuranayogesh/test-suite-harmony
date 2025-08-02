@@ -71,7 +71,7 @@ export function IssueView({ issue, onUpdate }: IssueViewProps) {
       )}
 
       <div className="flex gap-2 pt-4 border-t">
-        {issue.status === 'Open' && (
+        {(issue.status === 'Open' || issue.status === 'Reopen') && (
           <Button onClick={() => handleStatusChange('Fixed')} className="btn-primary">
             <CheckCircle className="h-4 w-4 mr-2" />
             Mark as Fixed
