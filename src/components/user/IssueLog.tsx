@@ -18,6 +18,14 @@ export function IssueLog() {
   const loadIssues = () => {
     const data = DataManager.loadData();
     setIssues(data.issues);
+    
+    // Update viewing issue if it's currently open
+    if (viewingIssue) {
+      const updatedIssue = data.issues.find(issue => issue.id === viewingIssue.id);
+      if (updatedIssue) {
+        setViewingIssue(updatedIssue);
+      }
+    }
   };
 
   const getStatusColor = (status: string) => {
